@@ -1,45 +1,50 @@
 package com.stepahead.springrest.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.stepahead.springrest.dao.EmployeeDAO;
+import com.stepahead.springrest.dao.EmployeeRepositoryDAO;
 import com.stepahead.springrest.entity.Employee;
 
-import jakarta.transaction.Transactional;
-
 @Service
-public class EmployeeServiceImpl implements EmployeeService{
-	
-	//define employeeDAO field
-	EmployeeDAO employeeDAO;
-	
-	//inject employeeDAO DAO using constructor injection
-	public EmployeeServiceImpl(EmployeeDAO employeeDAO) {
-		this.employeeDAO = employeeDAO;
+public class EmployeeServiceImpl implements EmployeeService {
+
+	// define employeeDAO field
+	EmployeeRepositoryDAO employeeRepositoryDAO;
+
+	// inject employeeDAO DAO using constructor injection
+	public EmployeeServiceImpl(EmployeeRepositoryDAO employeeDAO) {
+		this.employeeRepositoryDAO = employeeDAO;
 	}
 
 	@Override
 	public List<Employee> findAll() {
-		return employeeDAO.findAll();
+		return employeeRepositoryDAO.findAll();
 	}
 
 	@Override
 	public Employee findById(int theId) {
-		return employeeDAO.findById(theId);
+		Optional<Employee> result = employeeRepositoryDAO.findById(theId);
+
+		Employee theEmployee = null;
+		if (result.isPresent()) {
+			theEmployee = result.get();
+		} else {
+			throw new RuntimeException("Employee Id Not Found: "+ theId);
+		}
+		return theEmployee;
 	}
-	
-	@Transactional
+
 	@Override
 	public Employee save(Employee theEmployee) {
-		return employeeDAO.save(theEmployee);
+		return employeeRepositoryDAO.save(theEmployee);
 	}
-	
-	@Transactional
+
 	@Override
 	public void deleteById(int theId) {
-		employeeDAO.deleteById(theId);
+		employeeRepositoryDAO.deleteById(theId);
 	}
 
 }
